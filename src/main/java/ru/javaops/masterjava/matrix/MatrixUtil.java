@@ -1,8 +1,7 @@
 package ru.javaops.masterjava.matrix;
 
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.*;
 
 /**
  * gkislin
@@ -15,8 +14,47 @@ public class MatrixUtil {
         final int matrixSize = matrixA.length;
         final int[][] matrixC = new int[matrixSize][matrixSize];
 
+        class VectorMultiplier{
+            final int i;
+            final int j;
+            int result;
+
+            public VectorMultiplier(int i, int j) {
+                this.i = i;
+                this.j = j;
+            }
+
+            void calculate(){
+                int sum = 0;
+                for (int k = 0; k < matrixSize; k++) {
+                    sum += matrixA[i][k] * matrixB[k][j];
+                }
+                matrixC[i][j] = sum;
+            };
+        }
+
+        CompletionService<VectorMultiplier> completionService = new ExecutorCompletionService<>(executor);
+
+        for (int i = 0; i < matrixSize; i++) {
+            for (int j = 0; j < matrixSize; j++) {
+                VectorMultiplier multiplier = new VectorMultiplier(i, j);
+
+                completionService.submit(() -> {
+                    multiplier.calculate();
+                    return multiplier;
+                });
+
+            }
+        }
+
+
+        for(int i = 0; i<matrixSize*matrixSize; i++) {
+            completionService.take();
+        }
+
         return matrixC;
     }
+
 
     // TODO optimize by https://habrahabr.ru/post/114797/
     public static int[][] singleThreadMultiply(int[][] matrixA, int[][] matrixB) {
