@@ -7,9 +7,6 @@ import java.util.Set;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-import static sun.swing.SwingUtilities2.clipStringIfNecessary;
-import static sun.swing.SwingUtilities2.submit;
-
 public class MailService {
     private static final String OK = "OK";
 
@@ -23,7 +20,7 @@ public class MailService {
         final CompletionService<MailResult> completionService = new ExecutorCompletionService<>(mailExecutor);
 
         List<Future<MailResult>> futures = emails.stream()
-                .map(email -> mailExecutor.submit(() -> sendToUser(template, email)))
+                .map(email -> completionService.submit(() -> sendToUser(template, email)))
                 .collect(Collectors.toList());
 
         return new Callable<GroupResult>() {
