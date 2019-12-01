@@ -44,16 +44,14 @@ public class MatrixUtil {
             }
 
             void calculate() {
-                int[] newRow = new int[matrixSize];
                 for (int i = 0; i < matrixSize; i++) {
                     int[] thisRow = matrixA[i];
                     int sum = 0;
                     for (int k = 0; k < matrixSize; k++) {
                         sum += thisRow[k] * thatColumn[k];
                     }
-                    newRow[i] = sum;
+                    matrixC[i][j] = sum;
                 }
-                matrixC[j] = newRow;
             }
         }
 
@@ -77,7 +75,7 @@ public class MatrixUtil {
             completionService.take();
         }
 
-        return transpose(matrixC);
+        return matrixC;
     }
 
 
