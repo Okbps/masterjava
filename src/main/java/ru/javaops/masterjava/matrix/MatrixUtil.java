@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 public class MatrixUtil {
 
     // TODO implement parallel multiplication matrixA*matrixB
-    public static int[][] concurrentMultiply(int[][] matrixA, int[][] matrixB, ExecutorService executor) throws InterruptedException, ExecutionException {
+    public static int[][] concurrentMultiply(int[][] matrixA, int[][] matrixB, ExecutorService executor) throws InterruptedException {
         final int matrixSize = matrixA.length;
         final int[][] matrixC = new int[matrixSize][matrixSize];
 
@@ -86,7 +86,7 @@ public class MatrixUtil {
         return matrixC;
     }
 
-    private static int[][] transpose(int[][] matrixB) {
+    public static int[][] transpose(int[][] matrixB) {
         int bRows = matrixB.length;
         int bColumns = matrixB[0].length;
 
