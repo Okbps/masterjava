@@ -14,24 +14,6 @@ public class MatrixUtil {
         final int matrixSize = matrixA.length;
         final int[][] matrixC = new int[matrixSize][matrixSize];
 
-        class VectorMultiplier {
-            final int i;
-            final int j;
-
-            public VectorMultiplier(int i, int j) {
-                this.i = i;
-                this.j = j;
-            }
-
-            void calculate() {
-                int sum = 0;
-                for (int k = 0; k < matrixSize; k++) {
-                    sum += matrixA[i][k] * matrixB[k][j];
-                }
-                matrixC[i][j] = sum;
-            }
-        }
-
         class VectorMultiplier2 {
             final int j;
             final int[][] matrixA;
