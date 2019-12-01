@@ -14,7 +14,7 @@ public class MatrixUtil {
         final int matrixSize = matrixA.length;
         final int[][] matrixC = new int[matrixSize][matrixSize];
 
-        class VectorMultiplier{
+        class VectorMultiplier {
             final int i;
             final int j;
             int result;
@@ -24,13 +24,13 @@ public class MatrixUtil {
                 this.j = j;
             }
 
-            void calculate(){
+            void calculate() {
                 int sum = 0;
                 for (int k = 0; k < matrixSize; k++) {
                     sum += matrixA[i][k] * matrixB[k][j];
                 }
                 matrixC[i][j] = sum;
-            };
+            }
         }
 
         CompletionService<VectorMultiplier> completionService = new ExecutorCompletionService<>(executor);
@@ -43,12 +43,10 @@ public class MatrixUtil {
                     multiplier.calculate();
                     return multiplier;
                 });
-
             }
         }
 
-
-        for(int i = 0; i<matrixSize*matrixSize; i++) {
+        for (int i = 0; i < matrixSize * matrixSize; i++) {
             completionService.take();
         }
 
@@ -60,17 +58,48 @@ public class MatrixUtil {
     public static int[][] singleThreadMultiply(int[][] matrixA, int[][] matrixB) {
         final int matrixSize = matrixA.length;
         final int[][] matrixC = new int[matrixSize][matrixSize];
+//        final int[][] matrixBT = transpose(matrixB);
 
-        for (int i = 0; i < matrixSize; i++) {
-            for (int j = 0; j < matrixSize; j++) {
+        int[] thatColumn = new int[matrixSize];
+
+        for (int j = 0; j < matrixSize; j++) {
+            for (int k = 0; k < matrixSize; k++) {
+                thatColumn[k] = matrixB[k][j];
+            }
+
+            for (int i = 0; i < matrixSize; i++) {
+                int[] thisRow = matrixA[i];
                 int sum = 0;
                 for (int k = 0; k < matrixSize; k++) {
-                    sum += matrixA[i][k] * matrixB[k][j];
+                    sum += thisRow[k] * thatColumn[k];
                 }
                 matrixC[i][j] = sum;
             }
+
+/*            for (int j = 0; j < matrixSize; j++) {
+                int sum = 0;
+                for (int k = 0; k < matrixSize; k++) {
+                    sum += matrixA[i][k] * matrixBT[j][k];
+                }
+                matrixC[i][j] = sum;
+            }*/
         }
+
         return matrixC;
+    }
+
+    private static int[][] transpose(int[][] matrixB) {
+        int bRows = matrixB.length;
+        int bColumns = matrixB[0].length;
+
+        int[][] matrixBT = new int[bColumns][bRows];
+
+        for (int i = 0; i < bRows; i++) {
+            for (int j = 0; j < bColumns; j++) {
+                matrixBT[j][i] = matrixB[i][j];
+            }
+        }
+        return matrixBT;
     }
 
     public static int[][] create(int size) {
