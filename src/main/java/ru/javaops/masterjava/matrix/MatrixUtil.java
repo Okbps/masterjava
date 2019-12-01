@@ -27,7 +27,7 @@ public class MatrixUtil {
 
             void calculate() {
                 for (int i = 0; i < matrixSize; i++) {
-                    int[] thisRow = matrixA[i];
+                    final int[] thisRow = matrixA[i];
                     int sum = 0;
                     for (int k = 0; k < matrixSize; k++) {
                         sum += thisRow[k] * thatColumn[k];
@@ -40,7 +40,7 @@ public class MatrixUtil {
         CompletionService<VectorMultiplier2> completionService = new ExecutorCompletionService<>(executor);
 
         for (int j = 0; j < matrixSize; j++) {
-            int[] thatColumn = new int[matrixSize];
+            final int[] thatColumn = new int[matrixSize];
             for (int k = 0; k < matrixSize; k++) {
                 thatColumn[k] = matrixB[k][j];
             }
@@ -66,7 +66,7 @@ public class MatrixUtil {
         final int matrixSize = matrixA.length;
         final int[][] matrixC = new int[matrixSize][matrixSize];
 
-        int[] thatColumn = new int[matrixSize];
+        final int[] thatColumn = new int[matrixSize];
 
         for (int j = 0; j < matrixSize; j++) {
             for (int k = 0; k < matrixSize; k++) {
@@ -74,7 +74,7 @@ public class MatrixUtil {
             }
 
             for (int i = 0; i < matrixSize; i++) {
-                int[] thisRow = matrixA[i];
+                final int[] thisRow = matrixA[i];
                 int sum = 0;
                 for (int k = 0; k < matrixSize; k++) {
                     sum += thisRow[k] * thatColumn[k];
