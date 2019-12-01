@@ -17,7 +17,6 @@ public class MatrixUtil {
         class VectorMultiplier {
             final int i;
             final int j;
-            int result;
 
             public VectorMultiplier(int i, int j) {
                 this.i = i;
@@ -33,24 +32,52 @@ public class MatrixUtil {
             }
         }
 
-        CompletionService<VectorMultiplier> completionService = new ExecutorCompletionService<>(executor);
+        class VectorMultiplier2 {
+            final int j;
+            final int[][] matrixA;
+            final int[] thatColumn;
 
-        for (int i = 0; i < matrixSize; i++) {
-            for (int j = 0; j < matrixSize; j++) {
-                VectorMultiplier multiplier = new VectorMultiplier(i, j);
+            public VectorMultiplier2(int j, int[][] matrixA, int[] thatColumn) {
+                this.j = j;
+                this.matrixA = matrixA;
+                this.thatColumn = thatColumn;
+            }
 
-                completionService.submit(() -> {
-                    multiplier.calculate();
-                    return multiplier;
-                });
+            void calculate() {
+                int[] newRow = new int[matrixSize];
+                for (int i = 0; i < matrixSize; i++) {
+                    int[] thisRow = matrixA[i];
+                    int sum = 0;
+                    for (int k = 0; k < matrixSize; k++) {
+                        sum += thisRow[k] * thatColumn[k];
+                    }
+                    newRow[i] = sum;
+                }
+                matrixC[j] = newRow;
             }
         }
 
-        for (int i = 0; i < matrixSize * matrixSize; i++) {
+        CompletionService<VectorMultiplier2> completionService = new ExecutorCompletionService<>(executor);
+
+        for (int j = 0; j < matrixSize; j++) {
+            int[] thatColumn = new int[matrixSize];
+            for (int k = 0; k < matrixSize; k++) {
+                thatColumn[k] = matrixB[k][j];
+            }
+
+            VectorMultiplier2 multiplier = new VectorMultiplier2(j, matrixA, thatColumn);
+
+            completionService.submit(() -> {
+                multiplier.calculate();
+                return multiplier;
+            });
+        }
+
+        for (int i = 0; i < matrixSize; i++) {
             completionService.take();
         }
 
-        return matrixC;
+        return transpose(matrixC);
     }
 
 
@@ -58,7 +85,6 @@ public class MatrixUtil {
     public static int[][] singleThreadMultiply(int[][] matrixA, int[][] matrixB) {
         final int matrixSize = matrixA.length;
         final int[][] matrixC = new int[matrixSize][matrixSize];
-//        final int[][] matrixBT = transpose(matrixB);
 
         int[] thatColumn = new int[matrixSize];
 
@@ -75,14 +101,6 @@ public class MatrixUtil {
                 }
                 matrixC[i][j] = sum;
             }
-
-/*            for (int j = 0; j < matrixSize; j++) {
-                int sum = 0;
-                for (int k = 0; k < matrixSize; k++) {
-                    sum += matrixA[i][k] * matrixBT[j][k];
-                }
-                matrixC[i][j] = sum;
-            }*/
         }
 
         return matrixC;
