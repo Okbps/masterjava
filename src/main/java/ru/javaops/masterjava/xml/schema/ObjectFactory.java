@@ -58,6 +58,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Payload.Cities }
+     *
+     */
+    public Payload.GroupTypes createPayloadGroupTypes() {
+        return new Payload.GroupTypes();
+    }
+
+    /**
      * Create an instance of {@link Payload.Users }
      * 
      */

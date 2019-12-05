@@ -1,14 +1,9 @@
 
 package ru.javaops.masterjava.xml.schema;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlIDREF;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
@@ -41,7 +36,12 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "User", namespace = "http://javaops.ru")
 public class User {
 
-    @XmlElement(namespace = "http://javaops.ru", required = true)
+    @XmlAttribute(name = "id", required = true)
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    @XmlID
+    @XmlSchemaType(name = "ID")
+    protected String id;
+    @XmlAttribute(name = "email", required = true)
     protected String email;
     @XmlElement(namespace = "http://javaops.ru", required = true)
     protected String fullName;
@@ -51,6 +51,18 @@ public class User {
     @XmlIDREF
     @XmlSchemaType(name = "IDREF")
     protected Object city;
+
+    /**
+     * Gets the value of the id property.
+     *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
+     */
+    public String getId() {
+        return id;
+    }
 
     /**
      * Gets the value of the email property.
@@ -148,4 +160,12 @@ public class User {
         this.city = value;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", email='" + email + '\'' +
+                ", fullName='" + fullName + '\'' +
+                '}';
+    }
 }
