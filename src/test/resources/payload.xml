@@ -31,7 +31,7 @@
         </Project>
         <Project name="masterjava" description="">
             <Groups>
-                <Group name="topjava01" type="REGISTERING" users="user04 user02"/>
+                <Group name="masterjava01" type="REGISTERING" users="user04 user02"/>
             </Groups>
         </Project>
     </Projects>
