@@ -12,7 +12,7 @@
                     <xsl:text>Type</xsl:text>
                 </th>
             </tr>
-            <xsl:for-each select="/*[name()='Payload']/*[name()='Projects']/*[name()='Project' and @name='topjava']/*[name()='Groups']/*[name()='Group']">
+            <xsl:for-each select="/*[name()='Payload']/*[name()='Projects']/*[name()='Project' and @name=$project_name]/*[name()='Groups']/*[name()='Group']">
                 <tr>
                     <td>
                         <xsl:value-of select="@name"/>
