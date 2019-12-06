@@ -44,13 +44,37 @@ public class JaxbParserTest {
     }
 
     @Test
-    public void testUsersByProject() throws IOException, JAXBException {
+    public void testUsersByProject() throws Exception {
         String projectName = "masterjava";
 
+        List<User> users = getUsersByProject(projectName);
+
+        Assert.assertEquals(2, users.size());
+        Assert.assertEquals("user02", users.get(0).getId());
+        Assert.assertEquals("user04", users.get(1).getId());
+
+        users.forEach(System.out::println);
+    }
+
+    @Test
+    public void testUsersAsHtml() throws Exception {
+        String projectName = "masterjava";
+
+        StringBuilder stringBuilder = new StringBuilder("<html><header></header><body><table><tr><th>Full Name</th><th>Email</th></tr>");
+
+        List<User> users = getUsersByProject(projectName);
+        users.forEach(u -> stringBuilder.append(String.format("<tr><td>%s</td><td>%s</td></tr>", u.getFullName(), u.getEmail())));
+
+        stringBuilder.append("</table></body></html>");
+
+        System.out.println(stringBuilder);
+    }
+
+    private List<User> getUsersByProject(String projectName) throws IOException, JAXBException {
         Payload payload = JAXB_PARSER.unmarshal(
                 Resources.getResource("payload.xml").openStream());
 
-        List<User> users = payload.getProjects().getProject().stream()
+        return payload.getProjects().getProject().stream()
                 .filter(x -> projectName.equals(x.getName()))
                 .map(x -> x.getGroups().getGroup())
                 .flatMap(Collection::stream)
@@ -59,11 +83,5 @@ public class JaxbParserTest {
                 .distinct()
                 .sorted(Comparator.comparing(User::getId))
                 .collect(Collectors.toList());
-
-        Assert.assertEquals(2, users.size());
-        Assert.assertEquals("user02", users.get(0).getId());
-        Assert.assertEquals("user04", users.get(1).getId());
-
-        users.forEach(System.out::println);
     }
 }
