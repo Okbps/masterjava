@@ -1,4 +1,4 @@
-package ru.javaops.masterjava.service;
+package main.java.ru.javaops.masterjava.service;
 
 import java.util.Collections;
 import java.util.List;
