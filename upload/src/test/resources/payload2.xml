@@ -1,0 +1,34 @@
+<Payload xmlns="http://javaops.ru"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://javaops.ru payload.xsd">
+
+    <Projects>
+        <Project name="superpython">
+            <description>SuperPython</description>
+            <Group name="superpython01" type="FINISHED"/>
+        </Project>
+        <Project name="megapython">
+            <description>MegaPython</description>
+            <Group name="megapython01" type="CURRENT"/>
+            <Group name="megapython02" type="CURRENT"/>
+        </Project>
+        <Project name="gygapython">
+            <description>GygaPython</description>
+            <Group name="gygapython01" type="CURRENT"/>
+            <Group name="gygapython02" type="CURRENT"/>
+            <Group name="gygapython03" type="CURRENT"/>
+        </Project>
+    </Projects>
+    <Cities>
+        <City id="kzn">Казань</City>
+        <City id="grd">Гродно</City>
+        <City id="lnd">Лондон</City>
+    </Cities>
+    <Users>
+        <User flag="active" city="kzn" email="gmail@gmail.com" groupRefs="superpython01 megapython01">Eric</User>
+        <User flag="superuser" city="kzn" email="admin@javaops.ru" groupRefs="superpython01 megapython02 gygapython03">Kyle</User>
+        <User flag="deleted" city="grd" email="deleted@yandex.ru">Stan</User>
+        <User flag="active" city="grd" email="user1@gmail.com" groupRefs="gygapython01 gygapython02">Kenny</User>
+        <User flag="active" city="lnd" email="user2@yandex.ru" groupRefs="gygapython01">Butters</User>
+    </Users>
+</Payload>
