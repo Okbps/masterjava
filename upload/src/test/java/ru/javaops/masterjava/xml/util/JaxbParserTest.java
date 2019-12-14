@@ -63,7 +63,7 @@ public class JaxbParserTest {
             }
         }
 
-        ExecutorService exec = Executors.newFixedThreadPool(2);
+        ExecutorService exec = Executors.newFixedThreadPool(4);
         CompletionService<PayloadResult> service = new ExecutorCompletionService<>(exec);
 
         for (int i = 0; i < iterations; i++) {
@@ -87,9 +87,4 @@ public class JaxbParserTest {
             Assert.assertEquals(future.get().payload1, future.get().payload2);
         }
     }
-
-//    @Test
-//    public void testCityMulti() throws Exception {
-//
-//    }
 }
