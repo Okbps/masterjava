@@ -1,6 +1,8 @@
 
 package ru.javaops.masterjava.xml.schema;
 
+import com.google.common.base.Objects;
+
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -168,7 +170,7 @@ public class User {
      */
     public List<Object> getGroupRefs() {
         if (groupRefs == null) {
-            groupRefs = new ArrayList<Object>();
+            groupRefs = new ArrayList<>();
         }
         return this.groupRefs;
     }
@@ -176,5 +178,22 @@ public class User {
     @Override
     public String toString() {
         return value + '(' + email + ')';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equal(value, user.value) &&
+                Objects.equal(email, user.email) &&
+                flag == user.flag &&
+                Objects.equal(city, user.city) &&
+                Objects.equal(groupRefs, user.groupRefs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value, email, flag, city, groupRefs);
     }
 }

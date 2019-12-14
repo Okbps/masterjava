@@ -1,6 +1,8 @@
 
 package ru.javaops.masterjava.xml.schema;
 
+import com.google.common.base.Objects;
+
 import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -103,7 +105,7 @@ public class Project {
      */
     public List<Project.Group> getGroup() {
         if (group == null) {
-            group = new ArrayList<Project.Group>();
+            group = new ArrayList<>();
         }
         return this.group;
     }
@@ -211,6 +213,33 @@ public class Project {
             this.type = value;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Group group = (Group) o;
+            return Objects.equal(name, group.name) &&
+                    type == group.type;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(name, type);
+        }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Project project = (Project) o;
+        return Objects.equal(description, project.description) &&
+                Objects.equal(group, project.group) &&
+                Objects.equal(name, project.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(description, group, name);
+    }
 }

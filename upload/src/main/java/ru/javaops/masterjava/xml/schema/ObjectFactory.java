@@ -103,7 +103,6 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://javaops.ru", name = "City")
     public JAXBElement<CityType> createCity(CityType value) {
-        return new JAXBElement<CityType>(_City_QNAME, CityType.class, null, value);
+        return new JAXBElement<>(_City_QNAME, CityType.class, null, value);
     }
-
 }

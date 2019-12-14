@@ -1,6 +1,8 @@
 
 package ru.javaops.masterjava.xml.schema;
 
+import com.google.common.base.Objects;
+
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -198,11 +200,23 @@ public class Payload {
          */
         public List<CityType> getCity() {
             if (city == null) {
-                city = new ArrayList<CityType>();
+                city = new ArrayList<>();
             }
             return this.city;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Cities cities = (Cities) o;
+            return Objects.equal(city, cities.city);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(city);
+        }
     }
 
 
@@ -258,11 +272,23 @@ public class Payload {
          */
         public List<Project> getProject() {
             if (project == null) {
-                project = new ArrayList<Project>();
+                project = new ArrayList<>();
             }
             return this.project;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Projects projects = (Projects) o;
+            return Objects.equal(project, projects.project);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(project);
+        }
     }
 
 
@@ -318,11 +344,37 @@ public class Payload {
          */
         public List<User> getUser() {
             if (user == null) {
-                user = new ArrayList<User>();
+                user = new ArrayList<>();
             }
             return this.user;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Users users = (Users) o;
+            return Objects.equal(user, users.user);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(user);
+        }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Payload payload = (Payload) o;
+        return Objects.equal(projects, payload.projects) &&
+                Objects.equal(cities, payload.cities) &&
+                Objects.equal(users, payload.users);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(projects, cities, users);
+    }
 }

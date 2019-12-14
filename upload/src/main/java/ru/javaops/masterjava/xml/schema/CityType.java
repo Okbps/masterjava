@@ -1,6 +1,8 @@
 
 package ru.javaops.masterjava.xml.schema;
 
+import com.google.common.base.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -91,4 +93,17 @@ public class CityType {
         this.id = value;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CityType cityType = (CityType) o;
+        return Objects.equal(value, cityType.value) &&
+                Objects.equal(id, cityType.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value, id);
+    }
 }
