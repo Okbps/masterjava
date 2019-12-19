@@ -34,4 +34,12 @@ public class UserTestData {
             dao.insert(USER3);
         });
     }
+
+    public static void setUpBatch() {
+        UserDao dao = DBIProvider.getDao(UserDao.class);
+        dao.clean();
+        DBIProvider.getDBI().useTransaction((conn, status) ->
+                dao.insert(FIST5_USERS)
+        );
+    }
 }

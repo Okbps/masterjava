@@ -18,18 +18,22 @@ public class UserDaoTest extends AbstractDaoTest<UserDao> {
     }
 
     @BeforeClass
-    public static void init() throws Exception {
+    public static void init() {
         UserTestData.init();
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        UserTestData.setUp();
     }
 
     @Test
     public void getWithLimit() {
+        UserTestData.setUp();
         List<User> users = dao.getWithLimit(5);
+        Assert.assertEquals(FIST5_USERS, users);
+    }
+
+    @Test
+    public void getWithLimitBatch() {
+        UserTestData.setUpBatch();
+        List<User> users = dao.getWithLimit(5);
+        users.forEach(u -> u.setId(null));
         Assert.assertEquals(FIST5_USERS, users);
     }
 }
