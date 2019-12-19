@@ -37,13 +37,14 @@ public class UploadServlet extends HttpServlet {
         try {
 //            http://docs.oracle.com/javaee/6/tutorial/doc/glraq.html
             Part filePart = req.getPart("fileToUpload");
+            int batchChunkSize = Integer.parseInt(req.getParameter("batchChunkSize"));
             if (filePart.getSize() == 0) {
                 throw new IllegalStateException("Upload file have not been selected");
             }
             try (InputStream is = filePart.getInputStream()) {
                 List<User> users = userProcessor.process(is);
 
-                UserDao.setBatchChunkSize(UserDao.class, 999);
+                UserDao.setBatchChunkSize(UserDao.class, batchChunkSize);
                 UserDao dao = DBIProvider.getDao(UserDao.class);
                 DBIProvider.getDBI().useTransaction((conn, status) ->
                         dao.insert(users)

@@ -1,3 +1,4 @@
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Upload XML</title>
@@ -6,7 +7,10 @@
 <form action="" method="post" enctype="multipart/form-data">
     <h3>Select xml file to upload</h3>
     <p>
-        <input type="file" name="fileToUpload" id="fileToUpload"><br/>
+        <label for="fileToUpload">File to upload:</label>
+        <input type="file" name="fileToUpload" id="fileToUpload"><br/><br/>
+        <label for="batchChunkSize">Chunk size:</label>
+        <input type="number" name="batchChunkSize" id="batchChunkSize" required value="1000"><br/><br/>
     </p>
     <p>
         <input type="submit" value="Upload" name="submit">
