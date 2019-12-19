@@ -1,6 +1,8 @@
 package ru.javaops.masterjava.upload;
 
 import org.thymeleaf.context.WebContext;
+import ru.javaops.masterjava.persist.DBIProvider;
+import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
 
 import javax.servlet.ServletException;
@@ -23,13 +25,13 @@ public class UploadServlet extends HttpServlet {
     private final UserProcessor userProcessor = new UserProcessor();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final WebContext webContext = new WebContext(req, resp, req.getServletContext(), req.getLocale());
         engine.process("upload", webContext, resp.getWriter());
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final WebContext webContext = new WebContext(req, resp, req.getServletContext(), req.getLocale());
 
         try {
@@ -40,6 +42,13 @@ public class UploadServlet extends HttpServlet {
             }
             try (InputStream is = filePart.getInputStream()) {
                 List<User> users = userProcessor.process(is);
+
+                UserDao.setBatchChunkSize(UserDao.class, 999);
+                UserDao dao = DBIProvider.getDao(UserDao.class);
+                DBIProvider.getDBI().useTransaction((conn, status) ->
+                        dao.insert(users)
+                );
+
                 webContext.setVariable("users", users);
                 engine.process("result", webContext, resp.getWriter());
             }
