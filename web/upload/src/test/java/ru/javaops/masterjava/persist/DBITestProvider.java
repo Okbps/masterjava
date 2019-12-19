@@ -4,7 +4,7 @@ import java.sql.DriverManager;
 
 public class DBITestProvider {
     public static void initDBI() {
-        initDBI("jdbc:postgresql://localhost:5432/masterjava", "user", "password");
+        initDBI("jdbc:postgresql://localhost:5432/masterjava", "postgres", "postgres");
     }
 
     public static void initDBI(String dbUrl, String dbUser, String dbPassword) {
