@@ -1,5 +1,6 @@
 package ru.javaops.masterjava.upload;
 
+import com.google.common.collect.Lists;
 import org.thymeleaf.context.WebContext;
 import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.dao.UserDao;
@@ -15,6 +16,7 @@ import javax.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static ru.javaops.masterjava.common.web.ThymeleafListener.engine;
 
@@ -23,10 +25,16 @@ import static ru.javaops.masterjava.common.web.ThymeleafListener.engine;
 public class UploadServlet extends HttpServlet {
 
     private final UserProcessor userProcessor = new UserProcessor();
+    private final int USERS_DISPLAY_LIMIT = 20;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final WebContext webContext = new WebContext(req, resp, req.getServletContext(), req.getLocale());
+
+        UserDao dao = DBIProvider.getDao(UserDao.class);
+        List<User> users = dao.getWithLimit(USERS_DISPLAY_LIMIT);
+        webContext.setVariable("users", users);
+
         engine.process("upload", webContext, resp.getWriter());
     }
 
@@ -50,7 +58,7 @@ public class UploadServlet extends HttpServlet {
                         dao.insert(users)
                 );
 
-                webContext.setVariable("users", users);
+                webContext.setVariable("users", users.stream().limit(USERS_DISPLAY_LIMIT).collect(Collectors.toList()));
                 engine.process("result", webContext, resp.getWriter());
             }
         } catch (Exception e) {
