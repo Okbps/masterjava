@@ -14,7 +14,13 @@ public class UserTestData {
     public static User USER1;
     public static User USER2;
     public static User USER3;
-    public static List<User> FIST5_USERS;
+    public static User STAN;
+    public static User KYLE;
+    public static User ERIC;
+    public static User KENNY;
+    public static User LEOPOLD;
+    public static List<User> FIRST6_USERS;
+    public static List<User> SECOND6_USERS;
 
     public static void init() {
         ADMIN = new User("Admin", "admin@javaops.ru", UserFlag.superuser);
@@ -23,14 +29,21 @@ public class UserTestData {
         USER1 = new User("User1", "user1@gmail.com", UserFlag.active);
         USER2 = new User("User2", "user2@yandex.ru", UserFlag.active);
         USER3 = new User("User3", "user3@yandex.ru", UserFlag.active);
-        FIST5_USERS = ImmutableList.of(ADMIN, DELETED, FULL_NAME, USER1, USER2);
+        FIRST6_USERS = ImmutableList.of(ADMIN, DELETED, FULL_NAME, USER1, USER2);
+
+        STAN = new User("Stan", "stan@javaops.ru", UserFlag.superuser);
+        KYLE = new User("Kyle", "kyle@yandex.ru", UserFlag.deleted);
+        ERIC = new User("Eric", "eric@gmail.com", UserFlag.active);
+        KENNY = new User("Kenny", "kenny@gmail.com", UserFlag.active);
+        LEOPOLD = new User("Leopold", "leopold@yandex.ru", UserFlag.active);
+        SECOND6_USERS = ImmutableList.of(STAN, KYLE, ERIC, KENNY, LEOPOLD, USER1);
     }
 
     public static void setUp() {
         UserDao dao = DBIProvider.getDao(UserDao.class);
         dao.clean();
         DBIProvider.getDBI().useTransaction((conn, status) -> {
-            FIST5_USERS.forEach(dao::insert);
+            FIRST6_USERS.forEach(dao::insert);
             dao.insert(USER3);
         });
     }
@@ -38,8 +51,8 @@ public class UserTestData {
     public static void setUpBatch() {
         UserDao dao = DBIProvider.getDao(UserDao.class);
         dao.clean();
+
         DBIProvider.getDBI().useTransaction((conn, status) ->
-                dao.insert(FIST5_USERS)
-        );
+                dao.insert(FIRST6_USERS));
     }
 }
