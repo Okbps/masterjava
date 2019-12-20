@@ -10,7 +10,9 @@ import ru.javaops.masterjava.persist.util.AnnotationUtil;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RegisterMapperFactory(EntityMapperFactory.class)
 public abstract class UserDao implements AbstractDao {
@@ -40,13 +42,18 @@ public abstract class UserDao implements AbstractDao {
             }
         }
 
-        insertWitIdBatch(usersWithId);
-        insertGeneratedIdBatch(usersNoId);
+        if(!usersWithId.isEmpty()) {
+            insertWitIdBatch(usersWithId);
+        }
+
+        if(!usersNoId.isEmpty()) {
+            insertGeneratedIdBatch(usersNoId);
+        }
 
         return users;
     }
 
-    @SqlBatch("insert into users (full_name, email, flag) values (:fullName, :email, CAST(:flag AS user_flag)) ")
+    @SqlBatch("insert into users (full_name, email, flag) values (:fullName, :email, CAST(:flag AS user_flag)) ON CONFLICT(email) DO NOTHING RETURNING *")
     @BatchChunkSize(1000)
     abstract int[] insertGeneratedIdBatch(@BindBean Iterable<User> user);
 
@@ -54,7 +61,7 @@ public abstract class UserDao implements AbstractDao {
     @GetGeneratedKeys
     abstract int insertGeneratedId(@BindBean User user);
 
-    @SqlBatch("INSERT INTO users (id, full_name, email, flag) VALUES (:id, :fullName, :email, CAST(:flag AS user_flag)) ")
+    @SqlBatch("INSERT INTO users (id, full_name, email, flag) VALUES (:id, :fullName, :email, CAST(:flag AS user_flag)) ON CONFLICT(email) DO NOTHING RETURNING *")
     @BatchChunkSize(1000)
     abstract int[] insertWitIdBatch(@BindBean Iterable<User> user);
 
@@ -79,5 +86,17 @@ public abstract class UserDao implements AbstractDao {
                 }
             }
         }
+    }
+
+    public static List<User> subtractUsersByEmail(Collection<User> source, Collection<User> users){
+        return source.stream()
+                .filter(current -> {
+                    for(User user: users){
+                        if(user.getEmail().equals(current.getEmail())){
+                            return false;
+                        }
+                    }
+                    return true;
+                }).collect(Collectors.toList());
     }
 }
