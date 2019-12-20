@@ -1,10 +1,12 @@
 package ru.javaops.masterjava.persist;
 
 import com.google.common.collect.ImmutableList;
+import org.skife.jdbi.v2.Handle;
 import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
 import ru.javaops.masterjava.persist.model.UserFlag;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserTestData {
@@ -54,5 +56,24 @@ public class UserTestData {
 
         DBIProvider.getDBI().useTransaction((conn, status) ->
                 dao.insert(FIRST6_USERS));
+    }
+
+    public static List<User> insertBatch(Iterable<User> users) {
+        List<User> newUsers = new ArrayList<>();
+
+        Handle h = DBIProvider.getDBI().open();
+
+        String sql = "INSERT INTO public.users(full_name, email, flag) VALUES " +
+                UserDao.sqlValuesFrom(users) +
+                "ON CONFLICT (email) DO NOTHING RETURNING *";
+
+        h.createQuery(sql)
+                .map(User.class)
+                .iterator()
+                .forEachRemaining(newUsers::add);
+
+        h.close();
+
+        return newUsers;
     }
 }
