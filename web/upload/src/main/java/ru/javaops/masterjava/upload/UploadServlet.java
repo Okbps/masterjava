@@ -1,12 +1,10 @@
 package ru.javaops.masterjava.upload;
 
-import com.google.common.collect.Lists;
 import org.thymeleaf.context.WebContext;
 import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
