@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 @RegisterMapperFactory(EntityMapperFactory.class)
@@ -42,11 +43,11 @@ public abstract class UserDao implements AbstractDao {
             }
         }
 
-        if(!usersWithId.isEmpty()) {
+        if (!usersWithId.isEmpty()) {
             insertWitIdBatch(usersWithId);
         }
 
-        if(!usersNoId.isEmpty()) {
+        if (!usersNoId.isEmpty()) {
             insertGeneratedIdBatch(usersNoId);
         }
 
@@ -76,7 +77,7 @@ public abstract class UserDao implements AbstractDao {
     @Override
     public abstract void clean();
 
-    public  static <T extends Class<?>> void setBatchChunkSize(T obj, int size) {
+    public static <T extends Class<?>> void setBatchChunkSize(T obj, int size) {
         for (Method userDaoMethod : obj.getDeclaredMethods()) {
             if (userDaoMethod.getName().endsWith("Batch")) {
                 userDaoMethod.setAccessible(true);
@@ -88,15 +89,26 @@ public abstract class UserDao implements AbstractDao {
         }
     }
 
-    public static List<User> subtractUsersByEmail(Collection<User> source, Collection<User> users){
+    public static List<User> subtractUsersByEmail(Collection<User> source, Collection<User> users) {
         return source.stream()
                 .filter(current -> {
-                    for(User user: users){
-                        if(user.getEmail().equals(current.getEmail())){
+                    for (User user : users) {
+                        if (user.getEmail().equals(current.getEmail())) {
                             return false;
                         }
                     }
                     return true;
                 }).collect(Collectors.toList());
+    }
+
+    public static String sqlValuesFrom(Iterable<User> users) {
+        StringJoiner joiner = new StringJoiner(",");
+
+        for (User user : users) {
+            String str = String.format("('%s', '%s', '%s')", user.getFullName(), user.getEmail(), user.getFlag());
+            joiner.add(str);
+        }
+
+        return joiner.toString();
     }
 }
