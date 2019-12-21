@@ -48,8 +48,8 @@ public class UploadServlet extends HttpServlet {
                 throw new IllegalStateException("Upload file have not been selected");
             }
             try (InputStream is = filePart.getInputStream()) {
-                List<User> users = userProcessor.process(is);
-
+                UserProcessor processor = UserProcessor.ofInputStream(is);
+                List<User> users = processor.process(100);
                 UserDao.setBatchChunkSize(UserDao.class, batchChunkSize);
                 UserDao dao = DBIProvider.getDao(UserDao.class);
                 DBIProvider.getDBI().useTransaction((conn, status) ->

@@ -16,13 +16,24 @@ import java.util.List;
 
 public class UserProcessor {
     private static final JaxbParser jaxbParser = new JaxbParser(ObjectFactory.class);
+    private StaxStreamProcessor processor;
 
-    public List<User> process(final InputStream is) throws XMLStreamException, JAXBException {
-        final StaxStreamProcessor processor = new StaxStreamProcessor(is);
+    public static UserProcessor ofInputStream(InputStream is) {
+        UserProcessor userProcessor = new UserProcessor();
+        try {
+            userProcessor.processor = new StaxStreamProcessor(is);
+        } catch (XMLStreamException e) {
+            e.printStackTrace();
+        }
+
+        return userProcessor;
+    }
+
+    public List<User> process(int chunkSize) throws XMLStreamException, JAXBException {
         List<User> users = new ArrayList<>();
-
         JaxbUnmarshaller unmarshaller = jaxbParser.createUnmarshaller();
-        while (processor.doUntil(XMLEvent.START_ELEMENT, "User")) {
+
+        for (int i = 0; i < chunkSize && processor.doUntil(XMLEvent.START_ELEMENT, "User"); i++) {
             ru.javaops.masterjava.xml.schema.User xmlUser = unmarshaller.unmarshal(processor.getReader(), ru.javaops.masterjava.xml.schema.User.class);
             final User user = new User(xmlUser.getValue(), xmlUser.getEmail(), UserFlag.valueOf(xmlUser.getFlag().value()));
             users.add(user);
