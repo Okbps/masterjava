@@ -23,15 +23,15 @@ public class UserDaoTest extends AbstractDaoTest<UserDao> {
     public void getWithLimit() {
         UserTestData.setUp();
         List<User> users = dao.getWithLimit(5);
-        Assert.assertEquals(UserTestData.FIRST6_USERS, users);
+        Assert.assertEquals(UserTestData.FIRST5_USERS, users);
     }
 
     @Test
-    public void insertBatchWithConflict() {
+    public void insertBatchWithConflictFluent() {
         UserTestData.setUpBatch();
         List<User> users = dao.getWithLimit(5);
         users.forEach(u -> u.setId(null));
-        Assert.assertEquals(UserTestData.FIRST6_USERS, users);
+        Assert.assertEquals(UserTestData.FIRST5_USERS, users);
 
         List<User>newUsers = UserTestData.insertBatch(UserTestData.SECOND6_USERS);
         List<User>conflicted = UserDao.subtractUsersByEmail(UserTestData.SECOND6_USERS, newUsers);

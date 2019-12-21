@@ -21,7 +21,7 @@ public class UserTestData {
     public static User ERIC;
     public static User KENNY;
     public static User LEOPOLD;
-    public static List<User> FIRST6_USERS;
+    public static List<User> FIRST5_USERS;
     public static List<User> SECOND6_USERS;
 
     public static void init() {
@@ -31,7 +31,7 @@ public class UserTestData {
         USER1 = new User("User1", "user1@gmail.com", UserFlag.active);
         USER2 = new User("User2", "user2@yandex.ru", UserFlag.active);
         USER3 = new User("User3", "user3@yandex.ru", UserFlag.active);
-        FIRST6_USERS = ImmutableList.of(ADMIN, DELETED, FULL_NAME, USER1, USER2);
+        FIRST5_USERS = ImmutableList.of(ADMIN, DELETED, FULL_NAME, USER1, USER2);
 
         STAN = new User("Stan", "stan@javaops.ru", UserFlag.superuser);
         KYLE = new User("Kyle", "kyle@yandex.ru", UserFlag.deleted);
@@ -45,7 +45,7 @@ public class UserTestData {
         UserDao dao = DBIProvider.getDao(UserDao.class);
         dao.clean();
         DBIProvider.getDBI().useTransaction((conn, status) -> {
-            FIRST6_USERS.forEach(dao::insert);
+            FIRST5_USERS.forEach(dao::insert);
             dao.insert(USER3);
         });
     }
@@ -55,7 +55,7 @@ public class UserTestData {
         dao.clean();
 
         DBIProvider.getDBI().useTransaction((conn, status) ->
-                dao.insert(FIRST6_USERS));
+                dao.insert(FIRST5_USERS));
     }
 
     public static List<User> insertBatch(Iterable<User> users) {
