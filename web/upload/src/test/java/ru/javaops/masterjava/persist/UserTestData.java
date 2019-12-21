@@ -1,5 +1,6 @@
 package ru.javaops.masterjava.persist;
 
+import com.bertoncelj.jdbi.entitymapper.EntityMapper;
 import com.google.common.collect.ImmutableList;
 import org.skife.jdbi.v2.Handle;
 import ru.javaops.masterjava.persist.dao.UserDao;
@@ -58,7 +59,7 @@ public class UserTestData {
                 dao.insert(FIRST5_USERS));
     }
 
-    public static List<User> insertBatch(Iterable<User> users) {
+    public static List<User> insertBatchNew(Iterable<User> users) {
         List<User> newUsers = new ArrayList<>();
 
         Handle h = DBIProvider.getDBI().open();
@@ -68,12 +69,35 @@ public class UserTestData {
                 "ON CONFLICT (email) DO NOTHING RETURNING *";
 
         h.createQuery(sql)
-                .map(User.class)
+                .map(new EntityMapper<>(User.class))
                 .iterator()
                 .forEachRemaining(newUsers::add);
 
         h.close();
 
         return newUsers;
+    }
+
+    public static List<User> insertBatchConflicted(Iterable<User> users) {
+        List<User> conflicted = new ArrayList<>();
+
+        Handle h = DBIProvider.getDBI().open();
+
+        String sql = UserDao.sqlTableFrom(users) +
+                ", emails AS\n" +
+                "(INSERT INTO public.users(full_name, email, flag)\n" +
+                "SELECT full_name, email, flag FROM u\n" +
+                "ON CONFLICT (email) DO NOTHING\n" +
+                "RETURNING email)\n" +
+                "SELECT full_name, email, flag FROM u WHERE email NOT IN (SELECT email FROM emails)";
+
+        h.createQuery(sql)
+                .map(new EntityMapper<>(User.class))
+                .iterator()
+                .forEachRemaining(conflicted::add);
+
+        h.close();
+
+        return conflicted;
     }
 }
