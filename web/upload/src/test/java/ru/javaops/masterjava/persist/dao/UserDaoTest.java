@@ -33,8 +33,21 @@ public class UserDaoTest extends AbstractDaoTest<UserDao> {
         users.forEach(u -> u.setId(null));
         Assert.assertEquals(UserTestData.FIRST5_USERS, users);
 
-        List<User>newUsers = UserTestData.insertBatch(UserTestData.SECOND6_USERS);
-        List<User>conflicted = UserDao.subtractUsersByEmail(UserTestData.SECOND6_USERS, newUsers);
+        List<User> newUsers = UserTestData.insertBatchNew(UserTestData.SECOND6_USERS);
+        List<User> conflicted = UserDao.subtractUsersByEmail(UserTestData.SECOND6_USERS, newUsers);
+
+        Assert.assertTrue(conflicted.contains(UserTestData.USER1));
+        Assert.assertEquals(1, conflicted.size());
+    }
+
+    @Test
+    public void insertBatchWithConflictFluent2() {
+        UserTestData.setUpBatch();
+        List<User> users = dao.getWithLimit(5);
+        users.forEach(u -> u.setId(null));
+        Assert.assertEquals(UserTestData.FIRST5_USERS, users);
+
+        List<User> conflicted = UserTestData.insertBatchConflicted(UserTestData.SECOND6_USERS);
 
         Assert.assertTrue(conflicted.contains(UserTestData.USER1));
         Assert.assertEquals(1, conflicted.size());
