@@ -9,10 +9,7 @@ import ru.javaops.masterjava.persist.util.AnnotationUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RegisterMapperFactory(EntityMapperFactory.class)
@@ -32,30 +29,13 @@ public abstract class UserDao implements AbstractDao {
     }
 
     public Iterable<User> insert(Iterable<User> users) {
-        List<User> usersWithId = new ArrayList<>();
-        List<User> usersNoId = new ArrayList<>();
-
-        for (User user : users) {
-            if (user.isNew()) {
-                usersNoId.add(user);
-            } else {
-                usersWithId.add(user);
-            }
-        }
-
-        if (!usersWithId.isEmpty()) {
-            insertWitIdBatch(usersWithId);
-        }
-
-        if (!usersNoId.isEmpty()) {
-            insertGeneratedIdBatch(usersNoId);
-        }
-
+        insertGeneratedIdBatch(users);
         return users;
     }
 
     @SqlBatch("insert into users (full_name, email, flag) values (:fullName, :email, CAST(:flag AS user_flag)) ON CONFLICT(email) DO NOTHING RETURNING *")
     @BatchChunkSize(1000)
+    @GetGeneratedKeys
     abstract int[] insertGeneratedIdBatch(@BindBean Iterable<User> user);
 
     @SqlUpdate("INSERT INTO users (full_name, email, flag) VALUES (:fullName, :email, CAST(:flag AS user_flag)) ")
@@ -64,6 +44,7 @@ public abstract class UserDao implements AbstractDao {
 
     @SqlBatch("INSERT INTO users (id, full_name, email, flag) VALUES (:id, :fullName, :email, CAST(:flag AS user_flag)) ON CONFLICT(email) DO NOTHING RETURNING *")
     @BatchChunkSize(1000)
+    @GetGeneratedKeys
     abstract int[] insertWitIdBatch(@BindBean Iterable<User> user);
 
     @SqlUpdate("INSERT INTO users (id, full_name, email, flag) VALUES (:id, :fullName, :email, CAST(:flag AS user_flag)) ")
@@ -89,7 +70,7 @@ public abstract class UserDao implements AbstractDao {
         }
     }
 
-    public static List<User> subtractUsersByEmail(Collection<User> source, Collection<User> users) {
+    public static List<User> subtractUsersByEmail(Collection<User> source, Iterable<User> users) {
         return source.stream()
                 .filter(current -> {
                     for (User user : users) {
