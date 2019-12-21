@@ -92,4 +92,16 @@ public abstract class UserDao implements AbstractDao {
 
         return joiner.toString();
     }
+
+    public static String sqlTableFrom(Iterable<User> users){
+        StringJoiner joiner = new StringJoiner("UNION ALL\n");
+
+        for(User user: users){
+            String str = String.format("SELECT '%s' as full_name, '%s' as email, CAST ('%s' as user_flag) as flag%n",
+                    user.getFullName(), user.getEmail(), user.getFlag());
+            joiner.add(str);
+        }
+
+        return "WITH u AS (\n"+joiner.toString()+")";
+    }
 }
