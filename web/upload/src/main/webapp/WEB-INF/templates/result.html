@@ -6,6 +6,22 @@
 <body>
 <h4><a href="">Upload XML</a></h4>
 <h3>Uploaded users</h3>
+<div th:if="${not #lists.isEmpty(conflicted)}">
+    <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+        <tr>
+            <th>Emails conflicted</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${conflicted}">
+            <td th:utext="${c.email}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <br>
+    <br>
+</div>
 <div th:replace="fragments/users.html"></div>
 </body>
 </html>
