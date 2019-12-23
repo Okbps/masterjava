@@ -1,9 +1,12 @@
 package ru.javaops.masterjava.persist.dao;
 
+import com.bertoncelj.jdbi.entitymapper.EntityMapper;
 import com.bertoncelj.jdbi.entitymapper.EntityMapperFactory;
+import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.sqlobject.*;
 import org.skife.jdbi.v2.sqlobject.customizers.BatchChunkSize;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapperFactory;
+import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.model.User;
 import ru.javaops.masterjava.persist.util.AnnotationUtil;
 
@@ -103,5 +106,28 @@ public abstract class UserDao implements AbstractDao {
         }
 
         return "WITH u AS (\n"+joiner.toString()+")";
+    }
+
+    public static List<User> insertBatchConflicted(Iterable<User> users) {
+        List<User> conflicted = new ArrayList<>();
+
+        Handle h = DBIProvider.getDBI().open();
+
+        String sql = UserDao.sqlTableFrom(users) +
+                ", emails AS\n" +
+                "(INSERT INTO public.users(full_name, email, flag)\n" +
+                "SELECT full_name, email, flag FROM u\n" +
+                "ON CONFLICT (email) DO NOTHING\n" +
+                "RETURNING email)\n" +
+                "SELECT full_name, email, flag FROM u WHERE email NOT IN (SELECT email FROM emails)";
+
+        h.createQuery(sql)
+                .map(new EntityMapper<>(User.class))
+                .iterator()
+                .forEachRemaining(conflicted::add);
+
+        h.close();
+
+        return conflicted;
     }
 }
