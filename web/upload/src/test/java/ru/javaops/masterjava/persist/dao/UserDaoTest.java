@@ -4,7 +4,6 @@ import com.google.common.io.Resources;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.UserTestData;
 import ru.javaops.masterjava.persist.model.User;
 import ru.javaops.masterjava.upload.UserProcessor;
@@ -15,7 +14,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Semaphore;
+
+import static ru.javaops.masterjava.persist.UserTestData.*;
 
 public class UserDaoTest extends AbstractDaoTest<UserDao> {
 
@@ -56,7 +58,7 @@ public class UserDaoTest extends AbstractDaoTest<UserDao> {
         users.forEach(u -> u.setId(null));
         Assert.assertEquals(UserTestData.FIRST5_USERS, users);
 
-        List<User> conflicted = UserTestData.insertBatchConflicted(UserTestData.SECOND6_USERS);
+        List<User> conflicted = UserDao.insertBatchConflicted(UserTestData.SECOND6_USERS);
 
         Assert.assertTrue(conflicted.contains(UserTestData.USER1));
         Assert.assertEquals(1, conflicted.size());
@@ -64,37 +66,60 @@ public class UserDaoTest extends AbstractDaoTest<UserDao> {
 
     @SuppressWarnings("UnstableApiUsage")
     @Test
-    public void insertBatchConcurrent() {
-        UserDao.setBatchChunkSize(UserDao.class, 10);
-        UserDao dao = DBIProvider.getDao(UserDao.class);
-//        dao.clean();
+    public void insertBatchConcurrentPool() {
+        UserDao.setBatchChunkSize(UserDao.class, DB_CHUNK_SIZE);
         List<User> conflicted = new ArrayList<>();
 
         try (InputStream is = Resources.getResource("payload.xml").openStream()) {
-            int count = 0;
-            UserProcessor processor = UserProcessor.ofInputStream(is);
-            ExecutorService executor = Executors.newFixedThreadPool(4);
-            CompletionService<List<User>> service = new ExecutorCompletionService<>(executor);
-
-            while (true) {
-                List<User> users = processor.process(5);
-                if(users.isEmpty()){
-                    break;
-                }
-
-                count++;
-
-                service.submit(() -> UserTestData.insertBatchConflicted(users));
-            }
-
-            for (int i = 0; i < count; i++) {
-                conflicted.addAll(service.take().get());
-            }
-
+            conflicted = UserProcessor.insertUsersConcurrent(is, XML_CHUNK_SIZE);
         } catch (JAXBException | XMLStreamException | IOException | InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
         conflicted.forEach(System.out::println);
+    }
+
+    @Test
+    public void testThreads() {
+        Semaphore lock = new Semaphore(3);
+        int nThreads = 10;
+        Thread[] threads = new Thread[nThreads];
+
+        class R implements Runnable {
+            Semaphore lock;
+            String name;
+
+            public R(Semaphore lock, String name) {
+                this.lock = lock;
+                this.name = name;
+            }
+
+            @Override
+            public void run() {
+                try {
+                    lock.acquire();
+                    System.out.println(name + " acquired lock");
+                    Thread.sleep(500);
+                    lock.release();
+                    System.out.println(name + " released lock");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        for (int i = 0; i < nThreads; i++) {
+            Thread t = new Thread(new R(lock, "Thread #"+i));
+            t.start();
+            threads[i] = t;
+        }
+
+        for (int i = 0; i < nThreads; i++) {
+            try {
+                threads[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
