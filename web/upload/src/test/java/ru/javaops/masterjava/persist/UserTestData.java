@@ -24,6 +24,9 @@ public class UserTestData {
     public static User LEOPOLD;
     public static List<User> FIRST5_USERS;
     public static List<User> SECOND6_USERS;
+    public static final int DB_CHUNK_SIZE = 10;
+    public static final int XML_CHUNK_SIZE = 5;
+    public static final int N_THREADS = 4;
 
     public static void init() {
         ADMIN = new User("Admin", "admin@javaops.ru", UserFlag.superuser);
@@ -76,28 +79,5 @@ public class UserTestData {
         h.close();
 
         return newUsers;
-    }
-
-    public static List<User> insertBatchConflicted(Iterable<User> users) {
-        List<User> conflicted = new ArrayList<>();
-
-        Handle h = DBIProvider.getDBI().open();
-
-        String sql = UserDao.sqlTableFrom(users) +
-                ", emails AS\n" +
-                "(INSERT INTO public.users(full_name, email, flag)\n" +
-                "SELECT full_name, email, flag FROM u\n" +
-                "ON CONFLICT (email) DO NOTHING\n" +
-                "RETURNING email)\n" +
-                "SELECT full_name, email, flag FROM u WHERE email NOT IN (SELECT email FROM emails)";
-
-        h.createQuery(sql)
-                .map(new EntityMapper<>(User.class))
-                .iterator()
-                .forEachRemaining(conflicted::add);
-
-        h.close();
-
-        return conflicted;
     }
 }
