@@ -13,6 +13,7 @@ import javax.xml.stream.events.XMLEvent;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 
 public class UserProcessor {
     private static final JaxbParser jaxbParser = new JaxbParser(ObjectFactory.class);
@@ -39,5 +40,31 @@ public class UserProcessor {
             users.add(user);
         }
         return users;
+    }
+
+    public static List<User> insertUsersConcurrent(InputStream is, int xmlChunkSize) throws JAXBException, XMLStreamException, InterruptedException, ExecutionException {
+        List<User> conflicted = new ArrayList<>();
+        int nCallables = 0;
+        UserProcessor processor = UserProcessor.ofInputStream(is);
+        ExecutorService executor = Executors.newFixedThreadPool(Constants.N_THREADS);
+        CompletionService<InsertUsersCallable.Result> service = new ExecutorCompletionService<>(executor);
+
+        while (true) {
+            List<User> users = processor.process(xmlChunkSize);
+            if(users.isEmpty()){
+                break;
+            }
+
+            nCallables++;
+
+            service.submit(new InsertUsersCallable(users));
+        }
+
+        for (int i = 0; i < nCallables; i++) {
+            InsertUsersCallable.Result result = service.take().get();
+            conflicted.addAll(result.conflicted);
+        }
+
+        return conflicted;
     }
 }
