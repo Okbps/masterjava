@@ -65,6 +65,8 @@ public class UserProcessor {
             conflicted.addAll(result.conflicted);
         }
 
+        executor.shutdown();
+
         return conflicted;
     }
 }
