@@ -19,8 +19,8 @@ VALUES ('topjava01', 'FINISHED'),
        ('topjava02', 'FINISHED');
 
 INSERT into projects(name, description)
-VALUES ('topjava', 'Topjava'),
-       ('masterjava', 'Masterjava');
+VALUES ('masterjava', 'Masterjava'),
+       ('topjava', 'Topjava');
 
 INSERT into project_groups(project_id, group_id)
 VALUES (100000, 100000),
