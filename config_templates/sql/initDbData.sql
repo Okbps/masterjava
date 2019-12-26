@@ -1,8 +1,8 @@
 TRUNCATE TABLE cities, project_groups, user_groups, users, projects, groups;
 
 ALTER SEQUENCE user_seq RESTART WITH 100000;
-ALTER SEQUENCE groups_seq RESTART WITH 100000;
-ALTER SEQUENCE projects_seq RESTART WITH 100000;
+ALTER SEQUENCE group_seq RESTART WITH 100000;
+ALTER SEQUENCE project_seq RESTART WITH 100000;
 
 INSERT into cities(id, name)
 VALUES ('spb', 'Санкт-Петербург'),
