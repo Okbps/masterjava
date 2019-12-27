@@ -7,22 +7,21 @@ import ru.javaops.masterjava.persist.model.City;
 import java.util.List;
 
 public class CityTestData {
-    public static City KIV;
-    public static City MNSK;
-    public static City MOW;
-    public static City SPB;
-    public static List<City> FIRST3_CITITES;
+    public static City KIV = new City("kiv", "Киев");
+    public static City MNSK = new City("mnsk", "Минск");
+    public static City MOW = new City("mow", "Москва");
+    public static City SPB = new City("spb", "Санкт-Петербург");
+    public static List<City> FIRST3_CITITES = ImmutableList.of(KIV, MNSK, MOW);
 
     public static void init() {
-        SPB = new City("spb", "Санкт-Петербург");
-        MOW = new City("mow", "Москва");
-        KIV = new City("kiv", "Киев");
-        MNSK = new City("mnsk", "Минск");
-        FIRST3_CITITES = ImmutableList.of(KIV, MNSK, MOW);
+    }
+
+    public static void clean() {
+        DBIProvider.getDBI().useHandle(h -> h.execute("TRUNCATE TABLE cities CASCADE;"));
     }
 
     public static void setUp() {
-        CommonTestData.clean();
+        CityTestData.clean();
         CityDao dao = DBIProvider.getDao(CityDao.class);
         DBIProvider.getDBI().useTransaction((conn, status) -> {
             FIRST3_CITITES.forEach(dao::insert);
