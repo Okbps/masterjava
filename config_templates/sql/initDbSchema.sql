@@ -21,7 +21,7 @@ CREATE TABLE users
     full_name TEXT      NOT NULL,
     email     TEXT      NOT NULL,
     flag      user_flag NOT NULL,
-    city      TEXT REFERENCES cities (id)
+    city      TEXT REFERENCES cities (id) ON DELETE RESTRICT
 );
 
 CREATE UNIQUE INDEX email_idx ON users (email);
