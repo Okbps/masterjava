@@ -4,12 +4,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ru.javaops.masterjava.persist.UserTestData;
+import ru.javaops.masterjava.persist.CityTestData;
+import ru.javaops.masterjava.persist.CommonTestData;
 import ru.javaops.masterjava.persist.model.User;
 
 import java.util.List;
-
-import static ru.javaops.masterjava.persist.UserTestData.FIRST5_USERS;
+import java.util.stream.Collectors;
 
 public class UserDaoTest extends AbstractDaoTest<UserDao> {
 
@@ -18,30 +18,35 @@ public class UserDaoTest extends AbstractDaoTest<UserDao> {
     }
 
     @BeforeClass
-    public static void init() throws Exception {
-        UserTestData.init();
+    public static void init() {
+        CommonTestData.cleanUsers();
+        CityTestData.setUp();
+        CommonTestData.initUsers();
+        CommonTestData.insertUsers();
     }
 
     @Before
-    public void setUp() throws Exception {
-        UserTestData.setUp();
+    public void setUp() {
+//        UserTestData.setUp();
     }
 
     @Test
     public void getWithLimit() {
         List<User> users = dao.getWithLimit(5);
-        Assert.assertEquals(FIRST5_USERS, users);
+        Assert.assertEquals(CommonTestData.FIRST5_USERS, users);
     }
 
     @Test
-    public void insertBatch() throws Exception {
-        dao.clean();
-        dao.insertBatch(FIRST5_USERS, 3);
-        Assert.assertEquals(5, dao.getWithLimit(100).size());
+    public void insertBatch() {
+        CommonTestData.cleanUsers();
+        List<String> cityIds = CommonTestData.FIRST5_USERS.stream().map(u-> u.getCity().getId()).collect(Collectors.toList());
+        dao.insertBatch(CommonTestData.FIRST5_USERS, cityIds,3);
+        List<User> actual = dao.getWithLimit(100);
+        Assert.assertEquals(5, actual.size());
     }
 
     @Test
-    public void getSeqAndSkip() throws Exception {
+    public void getSeqAndSkip() {
         int seq1 = dao.getSeqAndSkip(5);
         int seq2 = dao.getSeqAndSkip(1);
         Assert.assertEquals(5, seq2 - seq1);
