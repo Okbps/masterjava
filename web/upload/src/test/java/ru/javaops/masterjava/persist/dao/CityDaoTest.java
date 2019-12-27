@@ -21,12 +21,12 @@ public class CityDaoTest extends AbstractDaoTest<CityDao> {
     }
 
     @BeforeClass
-    public static void init() throws Exception {
+    public static void init() {
         CityTestData.init();
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         CityTestData.setUp();
     }
 
@@ -42,7 +42,7 @@ public class CityDaoTest extends AbstractDaoTest<CityDao> {
     }
 
     @Test
-    public void insertBatch() throws Exception {
+    public void insertBatch() {
         CommonTestData.clean();
         dao.insertBatch(FIRST3_CITITES, 3);
         Assert.assertEquals(3, dao.getWithLimit(100).size());
