@@ -25,6 +25,14 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>persist</artifactId>
             <version>${project.version}</version>
+            <classifier>tests</classifier>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>persist</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.j2html</groupId>
