@@ -3,6 +3,8 @@
 --changeset gkislin:1
 CREATE SEQUENCE common_seq START 100000;
 
+CREATE SEQUENCE mail_seq START 100000;
+
 CREATE TABLE city (
   ref  TEXT PRIMARY KEY,
   name TEXT NOT NULL
@@ -31,4 +33,15 @@ CREATE TABLE user_group (
   user_id  INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
   group_id INTEGER NOT NULL REFERENCES groups (id),
   CONSTRAINT users_group_idx UNIQUE (user_id, group_id)
+);
+
+CREATE TYPE MAIL_RESULT AS ENUM ('SUCCESS', 'FAILED', 'EXCEPTION');
+
+CREATE TABLE mail_descriptor (
+  id         INTEGER PRIMARY KEY DEFAULT nextval('mail_seq'),
+  subject TEXT NOT NULL,
+  to_addresses TEXT NOT NULL,
+  cc_addresses TEXT NOT NULL,
+  sent_date TIMESTAMP NOT NULL,
+  sent_result  MAIL_RESULT  NOT NULL
 );
