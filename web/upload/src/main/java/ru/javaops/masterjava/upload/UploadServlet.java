@@ -42,11 +42,12 @@ public class UploadServlet extends HttpServlet {
             } else {
                 Part filePart = req.getPart("fileToUpload");
                 try (InputStream is = filePart.getInputStream()) {
-                    List<PayloadProcessor.FailedEmails> failed = payloadProcessor.process(is, chunkSize);
-                    log.info("Failed users: " + failed);
+                    List<PayloadProcessor.FailedEmails> failedProjects = payloadProcessor.processProjectsGroups(is, chunkSize);
+                    List<PayloadProcessor.FailedEmails> failedUsers = payloadProcessor.processCitiesUsers(is, chunkSize);
+                    log.info("Failed users: " + failedUsers);
                     final WebContext webContext =
                             new WebContext(req, resp, req.getServletContext(), req.getLocale(),
-                                    ImmutableMap.of("users", failed));
+                                    ImmutableMap.of("users", failedUsers));
                     engine.process("result", webContext, resp.getWriter());
                     return;
                 }
