@@ -43,6 +43,7 @@ public class UploadServlet extends HttpServlet {
                 Part filePart = req.getPart("fileToUpload");
                 try (InputStream is = filePart.getInputStream()) {
                     List<PayloadProcessor.FailedEmails> failedProjects = payloadProcessor.processProjectsGroups(is, chunkSize);
+                    is.reset();
                     List<PayloadProcessor.FailedEmails> failedUsers = payloadProcessor.processCitiesUsers(is, chunkSize);
                     log.info("Failed users: " + failedUsers);
                     final WebContext webContext =
