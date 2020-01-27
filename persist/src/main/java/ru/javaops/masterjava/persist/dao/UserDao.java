@@ -2,6 +2,7 @@ package ru.javaops.masterjava.persist.dao;
 
 import com.bertoncelj.jdbi.entitymapper.EntityMapperFactory;
 import one.util.streamex.IntStreamEx;
+import org.skife.jdbi.v2.TransactionIsolationLevel;
 import org.skife.jdbi.v2.sqlobject.*;
 import org.skife.jdbi.v2.sqlobject.customizers.BatchChunkSize;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapperFactory;
@@ -26,11 +27,15 @@ public abstract class UserDao implements AbstractDao {
     @SqlQuery("SELECT nextval('user_seq')")
     abstract int getNextVal();
 
-    @Transaction
+    @SqlQuery("SELECT setval('user_seq', (select nextval('user_seq')) + :step, false) - :step")
+    abstract int getNextValIncrement(int step);
+
+//    @Transaction
     public int getSeqAndSkip(int step) {
-        int id = getNextVal();
-        DBIProvider.getDBI().useHandle(h -> h.execute("ALTER SEQUENCE user_seq RESTART WITH " + (id + step)));
-        return id;
+//        int id = getNextVal();
+//        DBIProvider.getDBI().useHandle(h -> h.execute("ALTER SEQUENCE user_seq RESTART WITH " + (id + step)));
+//        return id;
+        return getNextValIncrement(step);
     }
 
     @SqlUpdate("INSERT INTO users (full_name, email, flag, city_ref) VALUES (:fullName, :email, CAST(:flag AS USER_FLAG), :cityRef) ")
