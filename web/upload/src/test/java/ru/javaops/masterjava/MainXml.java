@@ -4,6 +4,7 @@ import com.google.common.base.Splitter;
 import com.google.common.io.Resources;
 import j2html.tags.ContainerTag;
 import one.util.streamex.StreamEx;
+import org.slf4j.LoggerFactory;
 import ru.javaops.masterjava.xml.schema.ObjectFactory;
 import ru.javaops.masterjava.xml.schema.Payload;
 import ru.javaops.masterjava.xml.schema.Project;
@@ -25,6 +26,8 @@ public class MainXml {
 
     private static final Comparator<User> USER_COMPARATOR = Comparator.comparing(User::getValue).thenComparing(User::getEmail);
 
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(MainXml.class);
+
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
             System.out.println("Required argument: projectName");
@@ -34,7 +37,7 @@ public class MainXml {
         URL payloadUrl = Resources.getResource("payload.xml");
 
         Set<User> users = parseByJaxb(projectName, payloadUrl);
-        users.forEach(System.out::println);
+        users.forEach(user -> log.info("{}", user));
 
         System.out.println();
         String html = toHtml(users, projectName);
