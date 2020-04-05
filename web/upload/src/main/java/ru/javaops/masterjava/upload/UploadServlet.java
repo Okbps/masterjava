@@ -35,15 +35,14 @@ public class UploadServlet extends HttpServlet {
         String message;
         int chunkSize = CHUNK_SIZE;
         try {
-//            http://docs.oracle.com/javaee/6/tutorial/doc/glraq.html
             chunkSize = Integer.parseInt(req.getParameter("chunkSize"));
             if (chunkSize < 1) {
                 message = "Chunk Size must be > 1";
             } else {
                 Part filePart = req.getPart("fileToUpload");
-                try (InputStream is = filePart.getInputStream()) {
-                    List<PayloadProcessor.FailedEmails> failedProjects = payloadProcessor.processProjectsGroups(is, chunkSize);
-                    List<PayloadProcessor.FailedEmails> failedUsers = payloadProcessor.processCitiesUsers(is, chunkSize);
+                try (InputStream is1 = filePart.getInputStream(); InputStream is2 = filePart.getInputStream()) {
+                    List<PayloadProcessor.FailedEmails> failedUsers = payloadProcessor.processCitiesUsers(is1, chunkSize);
+                    List<PayloadProcessor.FailedEmails> failedProjects = payloadProcessor.processProjectsGroups(is2, chunkSize);
                     log.info("Failed users: " + failedUsers);
                     final WebContext webContext =
                             new WebContext(req, resp, req.getServletContext(), req.getLocale(),
@@ -53,7 +52,7 @@ public class UploadServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            log.info(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             message = e.toString();
         }
         out(req, resp, message, chunkSize);

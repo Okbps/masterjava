@@ -2,9 +2,11 @@ package ru.javaops.masterjava.persist.dao;
 
 import com.bertoncelj.jdbi.entitymapper.EntityMapperFactory;
 import one.util.streamex.StreamEx;
+import org.skife.jdbi.v2.TransactionIsolationLevel;
 import org.skife.jdbi.v2.sqlobject.*;
 import org.skife.jdbi.v2.sqlobject.customizers.BatchChunkSize;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapperFactory;
+import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.model.Group;
 
 import java.util.List;
@@ -33,7 +35,20 @@ public abstract class GroupDao implements AbstractDao {
         groups.setId(id);
     }
 
+    public int getSeqAndSkip(int step) {
+        return DBIProvider.getDBI().inTransaction(TransactionIsolationLevel.SERIALIZABLE, (conn, status) ->
+                {
+                    long id = (long)conn.select("SELECT nextval('common_seq')").iterator().next().get("nextval");
+                    conn.execute("ALTER SEQUENCE common_seq RESTART WITH " + (id + step));
+                    return Math.toIntExact(id);
+                }
+        );
+    }
+
     @SqlBatch("INSERT INTO groups (name, type, project_id) VALUES (:name, CAST(:type AS group_type), :projectId)")
     @GetGeneratedKeys
     public abstract int[] insertBatch(@BindBean List<Group> groups, @BatchChunkSize int chunkSize);
+
+    @SqlBatch("INSERT INTO groups (id, name, type, project_id) VALUES (:id, :name, CAST(:type AS group_type), :projectId) ON CONFLICT DO NOTHING")
+    public abstract void insertBatchWithId(@BindBean List<Group> groups, @BatchChunkSize int chunkSize);
 }
