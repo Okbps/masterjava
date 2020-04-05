@@ -25,15 +25,10 @@ public class PayloadProcessor {
         }
     }
 
-    public List<FailedEmails> processCitiesUsers(InputStream is, int chunkSize) throws XMLStreamException, JAXBException {
-        final StaxStreamProcessor processor = new StaxStreamProcessor(is);
-        val cities = cityProcessor.process(processor);
-        return userProcessor.process(processor, cities, chunkSize);
-    }
-
-    public List<FailedEmails> processProjectsGroups(InputStream is, int chunkSize) throws XMLStreamException, JAXBException {
+    public List<FailedEmails> process(InputStream is, int chunkSize) throws XMLStreamException, JAXBException {
         final StaxStreamProcessor processor = new StaxStreamProcessor(is);
         val projects = projectProcessor.process(processor);
-        return null;
+        val cities = cityProcessor.process(processor);
+        return userProcessor.process(processor, cities, chunkSize);
     }
 }

@@ -12,6 +12,7 @@ import ru.javaops.masterjava.xml.util.StaxStreamProcessor;
 
 import javax.xml.stream.XMLStreamException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -21,7 +22,7 @@ public class ProjectProcessor {
 
     public Map<String, Project> process(StaxStreamProcessor processor) throws XMLStreamException {
         val storedProjects = projectDao.getAsMap();
-        val storedGroups = groupDao.getAsMap();
+//        val storedGroups = groupDao.getAsMap();
         val newGroups = new ArrayList<Group>();
 
         while (processor.startElement("Project", "Projects")) {
@@ -37,12 +38,10 @@ public class ProjectProcessor {
             while (processor.startElement("Group", "Project")) {
                 val groupName = processor.getAttribute("name");
 
-                if (storedGroups.containsKey(groupName)) {
-
-                } else {
+//                if (!storedGroups.containsKey(groupName)) {
                     val type = GroupType.valueOf(processor.getAttribute("type"));
                     newGroups.add(new Group(processor.getAttribute("name"), type, projectId));
-                }
+//                }
             }
 
             if (!newGroups.isEmpty()) {
@@ -52,6 +51,8 @@ public class ProjectProcessor {
                 }
 
                 groupDao.insertBatchWithId(newGroups, newGroups.size());
+
+//                newGroups.forEach(group -> storedGroups.put(group.getName(), group));
             }
         }
 

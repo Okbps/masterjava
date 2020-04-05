@@ -40,9 +40,8 @@ public class UploadServlet extends HttpServlet {
                 message = "Chunk Size must be > 1";
             } else {
                 Part filePart = req.getPart("fileToUpload");
-                try (InputStream is1 = filePart.getInputStream(); InputStream is2 = filePart.getInputStream()) {
-                    List<PayloadProcessor.FailedEmails> failedUsers = payloadProcessor.processCitiesUsers(is1, chunkSize);
-                    List<PayloadProcessor.FailedEmails> failedProjects = payloadProcessor.processProjectsGroups(is2, chunkSize);
+                try (InputStream is1 = filePart.getInputStream()) {
+                    List<PayloadProcessor.FailedEmails> failedUsers = payloadProcessor.process(is1, chunkSize);
                     log.info("Failed users: " + failedUsers);
                     final WebContext webContext =
                             new WebContext(req, resp, req.getServletContext(), req.getLocale(),
